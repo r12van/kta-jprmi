@@ -1,104 +1,159 @@
-# 🕌 SIM-JPRMI (Sistem Informasi Manajemen JPRMI)
+# KTA JPRMI
 
-![Laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap_5-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
-![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)
+Sistem informasi keanggotaan JPRMI berbasis Laravel untuk pengelolaan data anggota, kepengurusan struktural, dan pencetakan Kartu Tanda Anggota (KTA).
 
-**SIM-JPRMI** adalah Aplikasi Sistem Informasi Manajemen berbasis Web yang dirancang khusus untuk mengelola pusat data keanggotaan dan kepengurusan Jaringan Pemuda Remaja Masjid Indonesia (JPRMI) secara nasional. 
+Repository resmi: `https://github.com/r12van/kta-jprmi`
 
-Aplikasi ini mendukung hierarki multi-level administrator (Pusat, Wilayah/Provinsi, Daerah/Kota) dengan fitur isolasi data cerdas dan otomatisasi rekam jejak struktural anggota.
+## Stack
 
----
+- Laravel 12
+- PHP 8.2
+- MariaDB 10.11
+- Nginx
+- FrankenPHP
+- Vite
 
-## ✨ Fitur Unggulan (Key Features)
+## Deploy Dengan Docker
 
-- 🔐 **Multi-Level RBAC:** Pembatasan akses super ketat. Admin Provinsi (PW) hanya bisa melihat dan mengelola data provinsinya sendiri, begitu juga dengan Admin Daerah (PD).
-- 📈 **Executive Dashboard:** Visualisasi data *real-time* menggunakan Chart.js (Pertumbuhan anggota, komposisi gender, sebaran usia, dan Top 10 Provinsi).
-- ⚡ **Server-Side DataTables:** Pemrosesan jutaan baris data anggota tanpa *lag* menggunakan Yajra DataTables, lengkap dengan fitur pencarian dan filter wilayah kustom.
-- 🪪 **Smart Member Lifecycle:** Otomatisasi perpindahan status anggota (Remaja Masjid ➔ Pengurus ➔ Alumni) berdasarkan riwayat jabatan struktural yang aktif/demisioner.
-- 🛡️ **Watermark KTP Otomatis:** Keamanan data tingkat tinggi. Setiap unggahan foto KTP pendaftar akan otomatis distempel *watermark* transparan (menggunakan Intervention Image) sebelum masuk ke *database*.
-- 🖨️ **Export Data Percetakan:** Satu kali klik untuk mengekspor data anggota terverifikasi (berdasarkan filter wilayah) ke Excel untuk kebutuhan cetak Kartu Tanda Anggota (KTA).
+Panduan ini memakai Docker Compose yang sudah ada di repository.
 
----
+### 1. Clone repository
 
-## 🛠️ Stack Teknologi
-
-- **Framework:** Laravel 10.x / 11.x (PHP 8.2+)
-- **Database:** MySQL / MariaDB
-- **Frontend:** Bootstrap 5, FontAwesome 5/6
-- **Packages Utama:**
-  - `yajra/laravel-datatables-oracle` (Server-Side Tables)
-  - `laravolt/indonesia` (Data Master Provinsi, Kota, Kecamatan)
-  - `maatwebsite/excel` (Export Data)
-  - `intervention/image` (Image Manipulation & Watermarking)
-
----
-
-## 🚀 Panduan Instalasi (Local Development)
-
-Ikuti langkah-langkah berikut untuk menjalankan project ini di komputer lokal Anda:
-
-### 1. Kebutuhan Sistem (Prerequisites)
-Pastikan Anda sudah menginstal:
-- PHP >= 8.2
-- Composer
-- Node.js & NPM
-- MySQL Server (XAMPP / Laragon)
-
-### 2. Clone & Setup Library
 ```bash
-git clone [https://github.com/username-anda/sim-jprmi.git](https://github.com/username-anda/sim-jprmi.git)
-cd sim-jprmi
-composer install
-npm install && npm run build
+git clone https://github.com/r12van/kta-jprmi.git
+cd kta-jprmi
 ```
 
-### 3. Konfigurasi Environment
-Duplikasi file `.env.example` menjadi `.env`:
-``` bash
+### 2. Siapkan environment
+
+Salin file environment lalu sesuaikan nilainya:
+
+```bash
 cp .env.example .env
 ```
-Buka file `.env` dan sesuaikan kredensial database Anda:
-```bash
+
+Minimal ubah bagian berikut di `.env`:
+
+```env
+APP_NAME="Kartu Tanda Anggota JPRMI"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=http://localhost:8080
+
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
+DB_HOST=db
 DB_PORT=3306
 DB_DATABASE=db_jprmi
-DB_USERNAME=root
-DB_PASSWORD=
+DB_USERNAME=jprmi_user
+DB_PASSWORD=password_rahasia
 ```
 
-### 4. Generate Key & Storage Link
-_Langkah ini sangat penting agar foto profil dan KTP bisa diakses!_
+Jika deployment memakai domain sendiri, ganti:
+
+- `APP_URL` ke URL produksi Anda
+- `server_name` di `nginx/default.conf`
+
+### 3. Install dependency tanpa PHP/Node di host
+
+Project ini dapat disiapkan penuh lewat container sementara.
+
+Install dependency PHP:
+
 ```bash
-php artisan key:generate
-php artisan storage:link
+docker run --rm -v "${PWD}:/app" -w /app composer:2 composer install --no-dev --optimize-autoloader
 ```
 
-### 5. Setup Database & Wilayah
-Jalankan migrasi database beserta seeder bawaan untuk mengisi data admin utama dan data wilayah Indonesia.
+Build asset frontend:
+
 ```bash
-php artisan migrate --seed
+docker run --rm -v "${PWD}:/app" -w /app node:22-alpine npm install
+docker run --rm -v "${PWD}:/app" -w /app node:22-alpine npm run build
 ```
-_(Catatan: Pastikan seeder Laravolt\Indonesia\Seeder sudah berjalan agar tabel provinsi dan kota terisi)._
 
-### 6. ⚠️ Setup Watermark KTP (Wajib)
-Aplikasi ini membutuhkan file stempel untuk KTP.
-1. Siapkan logo/teks format **PNG Transparan** (misal: "Hanya untuk JPRMI").
-2. Simpan file tersebut dengan nama persis `watermark-ktp.png`.
-3. Letakkan file tersebut di dalam folder `public/images/watermark-ktp.png`.
+Jika Anda memakai PowerShell dan `${PWD}` bermasalah, ganti dengan path absolut project.
 
-### 7. Jalankan Aplikasi
+### 4. Jalankan container
+
 ```bash
-php artisan serve
+docker compose up -d --build
 ```
-Aplikasi kini bisa diakses melalui `http://localhost:8000`.
 
-### 🔑 Default Login Akses
-Jika Anda menggunakan Seeder bawaan, gunakan kredensial berikut untuk masuk sebagai Admin Pusat (PP):
-- **Email**: `admin.pp@jprmi.id`
-- **Password**: `password123` _(atau sesuai yang Anda set di Seeder)_
-Segera ubah password ini melalui menu *Profil Saya* di pojok kanan atas setelah Anda berhasil login!
+Service yang dijalankan:
 
-### 👨‍💻 Kontributor
-Sistem ini dikembangkan dan didesain secara khusus oleh `(https://rizvan.my.id)` untuk memenuhi standarisasi manajemen Jaringan Pemuda Remaja Masjid Indonesia.
+- `app`: Laravel di atas FrankenPHP
+- `nginx`: reverse proxy publik
+- `db`: MariaDB
+
+Aplikasi akan tersedia di `http://localhost:8080`.
+
+### 5. Inisialisasi Laravel
+
+Jalankan perintah berikut setelah container aktif:
+
+```bash
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan storage:link
+docker compose exec app php artisan migrate --seed --force
+```
+
+Opsional untuk optimasi konfigurasi:
+
+```bash
+docker compose exec app php artisan config:cache
+docker compose exec app php artisan route:cache
+docker compose exec app php artisan view:cache
+```
+
+### 6. Siapkan file watermark KTP
+
+Simpan file PNG transparan berikut di path:
+
+```text
+public/images/watermark-ktp.png
+```
+
+File ini dipakai saat upload foto KTP.
+
+### 7. Verifikasi deployment
+
+Cek status container:
+
+```bash
+docker compose ps
+```
+
+Lihat log jika ada masalah:
+
+```bash
+docker compose logs -f
+```
+
+## Default akses awal
+
+Jika seeder default masih digunakan, cek akun admin awal di seeder project Anda lalu segera ganti password setelah login pertama.
+
+## Operasional singkat
+
+Restart service:
+
+```bash
+docker compose restart
+```
+
+Matikan service:
+
+```bash
+docker compose down
+```
+
+Matikan service beserta volume database:
+
+```bash
+docker compose down -v
+```
+
+## Catatan
+
+- Port publik default adalah `8080` untuk HTTP dan `8443` untuk HTTPS.
+- Database MariaDB di-publish ke host pada port `3306`.
+- Folder project di-mount ke container, jadi perubahan source code langsung terlihat oleh service.
