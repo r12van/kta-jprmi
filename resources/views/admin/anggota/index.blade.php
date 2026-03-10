@@ -76,7 +76,7 @@
                 <thead>
                     <tr>
                         <th>No Urut</th>
-                        <th>NIA</th>
+                        <th>ID Anggota</th>
                         <th>Nama Lengkap</th>
                         <th>Wilayah (Prov/Kota)</th>
                         <th>Jenis Anggota</th>

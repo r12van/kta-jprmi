@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # 1. Application Server (FrankenPHP)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app_kta_jprmi
+    restart: unless-stopped
+    environment:
+      # FrankenPHP mendengarkan port 8080 secara internal
+      - SERVER_NAME=:8080
+      # Setup khusus agar Laravel bisa dijalankan via worker FrankenPHP
+      - FRANKENPHP_CONFIG="worker ./public/index.php"
+    volumes:
+      - .:/app
+    networks:
+      - network_kta_jprmi
+    depends_on:
+      - db
+
+  # 2. Web Server / Reverse Proxy (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_kta_jprmi
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+      - "8443:443"
+    volumes:
+      # Mounting konfigurasi Nginx dari komputer lokal Anda ke dalam container
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      # Nginx butuh akses baca ke root direktori public untuk file statis (CSS/JS)
+      - .:/app:ro
+    networks:
+      - jprmi_network
+    depends_on:
+      - app
+
+  # 3. Database Server (MariaDB)
+  db:
+    image: mariadb:10.11
+    container_name: sim_jprmi_db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: db_jprmi
+      MYSQL_USER: jprmi_user
+      MYSQL_PASSWORD: password_rahasia
+      MYSQL_ROOT_PASSWORD: root_password_rahasia
+    volumes:
+      - jprmi_db_data:/var/lib/mysql
+    networks:
+      - jprmi_network
+
+networks:
+  jprmi_network:
+    driver: bridge
+
+volumes:
+  jprmi_db_data:

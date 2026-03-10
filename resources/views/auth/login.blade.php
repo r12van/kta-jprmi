@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Admin JPRMI</title>
+    <title>Login Admin | Jaringan Pemuda Remaja Masjid Indonesia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="shortcut icon" href="{{asset('images/logo-jprmi.png')}}" type="image/x-icon">
+
     <style>
         body {
             background-color: #f0f2f5;
@@ -53,12 +55,10 @@
             <div class="card login-card">
                 <div class="login-header">
                     <div class="mb-3">
-                        <div style="width: 60px; height: 60px; background: white; color: #0f5132; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-weight: bold; font-size: 20px;">
-                            JP
-                        </div>
+                        <img src="{{ asset('images/logo-jprmi.png') }}" alt="Logo JPRMI" class="rounded" width="150" height="150">
                     </div>
-                    <h4>SIM-JPRMI</h4>
-                    <small class="opacity-75">Sistem Informasi Manajemen Anggota</small>
+                    <h4>Jaringan Pemuda Remaja Masjid Indonesia</h4>
+                    <small class="opacity-75">Manajemen Anggota JPRMI</small>
                 </div>
 
                 <div class="card-body p-4">

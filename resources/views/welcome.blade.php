@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JPRMI</title>
+    <title>Kartu Tanda Anggota JPRMI | Jaringan Pemuda Remaja Masjid Indonesia</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
+    <link rel="shortcut icon" href="{{asset('images/logo-jprmi.png')}}" type="image/x-icon">
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; }
         .navbar-brand { font-weight: 800; color: #198754 !important; letter-spacing: 1px; }
@@ -23,7 +23,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
         <div class="container">
             <a class="navbar-brand" href="#">
-                <i class="fas fa-mosque me-2"></i> SIM-JPRMI
+                <img src="{{asset('images/logo-jprmi.png')}}" alt="logo JPRMI" class="me-2" width="40" height="40"> KTA - JPRMI
             </a>
             <div class="d-flex align-items-center">
                 @auth
@@ -67,7 +67,7 @@
 
         // 2. Tambahkan Tile Layer (Desain Terang/Positron dari CartoDB agar terlihat elegan)
         L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; <a href="https://carto.com/">CartoDB</a> | SIM JPRMI',
+            attribution: '&copy; <a href="https://carto.com/">CartoDB</a> | KTA JPRMI',
             subdomains: 'abcd',
             maxZoom: 10,
             minZoom: 4
